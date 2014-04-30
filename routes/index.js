@@ -1,6 +1,6 @@
 module.exports = function Route(app){
 	var users = new Array();
-	var word_bank = ['test', 'javascript', 'terminal', 'zebra', 'microwave', 'your mom', 'beta tester', 'black belt', 'ninja', 'samurai', 'ruby on rails', 'russia', 'california', 'washington', 'czechoslovakia', 'horse']
+	var word_bank = ['test', 'javascript', 'terminal', 'zebra', 'microwave', 'your mom', 'beta tester', 'black belt', 'ninja', 'samurai', 'ruby on rails', 'russia', 'california', 'washington', 'czechoslovakia', 'horse', 'monster', 'tea', 'granite', 'peanut butter', 'obama', 'grilled cheese', 'earthquake', 'sweet tea']
 	var bigCount = 0;
 
 	app.get('/', function(req, res){
@@ -30,9 +30,13 @@ module.exports = function Route(app){
 	{
 		for(var i=0; i<users.length; i++){
 			if(users[i].id == req.socket.id){
-			var POSTER = users[i].name
-			}
-		}
+			var POSTER = users[i].name;
+			var temp = users[i];
+			users[i] = users[(users.length-1)];
+			users[(users.length-1)] = temp;
+			users.pop();
+			};
+		};
 		app.io.broadcast('disconnected', { name: POSTER } );
 		console.log('Disconnected ' + req.socket.id );
 	});
@@ -70,15 +74,15 @@ module.exports = function Route(app){
 		setInterval(function(){
 			app.io.broadcast('scoreUpdate', { allScores: users } );
 		}, 1000);
-	
-			setInterval(function(){
-				for(var i=0; i<users.length; i++){
-					users[i].roundScore = 0;
-				};
-			}, 30000);	
 
+		//round score update every 30 seconds
+		setInterval(function(){
+			for(var i=0; i<users.length; i++){
+				users[i].roundScore = 0;
+			};
+		}, 30000);	
 	}());
-
+	//answer validation and score update
 	app.io.route('answerAttempt', function(req){
 		if (req.data[0].value == WORD && bigCount == 0){
 			req.io.emit('answerValidation', { verdict: "Correct" } );
@@ -92,9 +96,5 @@ module.exports = function Route(app){
 		} else {
 			req.io.emit('answerValidation', { verdict: "Incorrect" } );
 		};
-	});
-
-
-
-	
+	});	
 }

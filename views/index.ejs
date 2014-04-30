@@ -8,9 +8,11 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet' type='text/css'>
     <link rel='stylesheet' href='/stylesheets/style.css' />
 
-    <script type="text/JavaScript">
+
+    <script>
         function killCopy(e){ return false };
         function reEnable(){ return true };
         document.onselectstart= new Function ("return false");
@@ -20,7 +22,6 @@
         };
     </script>
 
-
   </head>
   <body>
 
@@ -28,9 +29,6 @@
     <div id='container'></div>
     <div id='users'></div>
 
-
-
-    
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
 
@@ -50,13 +48,11 @@
             //Server logs user
 	    	io.on('logged_in', function(stuff){
         		console.log('client received logged_in');
-
                 //appends scoreboard
                 $('#container').append("<h4> Hi " +stuff.name +" </h4> \
                     <div id='score'> Score: 0 </div> \
                     <div id='scoreboard' class='' > \
                     </div>");
-
                 // appends main view area to screen when server logs this user
                 $('#container').append("\
                     <div id='viewBox' class=''>\
@@ -68,7 +64,6 @@
                             </form> \
                         </div> \
                     </div> ");
-
                 //enter button sends the answer to the server
                 $('#answerForm').keydown(function(e){
                     if(e.keyCode == 13) {
@@ -77,7 +72,6 @@
                         return false;
                     }
                 });
-
                 // appends chat area to screen when server logs this user
         		$('#container').append("\
                     <div id='chatbox' class=''> \
@@ -85,11 +79,10 @@
                         </div> \
                         <div id='type' class=''> \
                             <form id='typeHere'>\
-                                <textarea id='chat' name='chat'> </textarea> \
+                                <textarea id='chat' name='chat' > </textarea> \
                             </form> \
                         </div>\
                     </div>");
-
 	    		//enter button sends message to server to be broadcast to everyone
 	    		$('#typeHere').keyup(function(e){
 	    			if(e.keyCode == 13) {
@@ -100,7 +93,6 @@
 	    		});
 
     		});
-
 	    	//Server broadcasts a message to all users about who just logged in
     		io.on('new_user', function(stuff){
     			console.log('client received new_user');
@@ -108,7 +100,6 @@
     			$('#chatArea').append("SERVER: " + stuff.name + " has logged in " + "<span class='time'>" + time + "</span>" + ".<br>");
     			$("#chatArea").scrollTop($("#chatArea")[0].scrollHeight);
     		});
-
     		//client receives message broadcast
     		io.on('update', function(message){
     			time = displayTime();
@@ -116,7 +107,6 @@
     			$("#chatArea").scrollTop($("#chatArea")[0].scrollHeight);
     			$('#chat').val('');
     		});
-
             //Server broadcasting a disconnect
             io.on('disconnected', function(stuff){
                 console.log('client received new_user');
@@ -124,12 +114,10 @@
                 $('#chatArea').append("SERVER: " + stuff.name + " has disconnected " + "<span class='time'>" + time + "</span>" + ".<br>");
                 $("#chatArea").scrollTop($("#chatArea")[0].scrollHeight);
             });
-
             //Server broadcasting the Word and client appending it tot he page
             io.on('new_word', function(word){
                 $('#answerDiv').html("<br>" + word.word)
             });
-
             //Server emiting whether clients answer is correct and updates score
             io.on('answerValidation', function(verdict){
                 // $('#verdictDiv').html(verdict.verdict);
@@ -142,15 +130,15 @@
                     document.getElementById("answerForm").reset();
                 };
             });
-
+            //updates your personal score
             io.on('myScoreUpdate', function(score){
-                $('#score').html("Your Score:" + score.score + " (+" + score.roundScore + ")");
+                $('#score').html("Your Score: " + score.score + " (+" + score.roundScore + ")");
             });
-
+            //receives and prints the countdown
             io.on('countdown', function(count){
                 $('#answerDiv').html("Next Word In <br>" + count.count + "<br> Seconds");
             });
-
+            //updates the scoreboard
             io.on('scoreUpdate', function(score){
                     var scoreString = "";
                     for(var i=0; i< score.allScores.length; i++){
@@ -158,34 +146,22 @@
                     };
                     $("#scoreboard").html(scoreString);     
             });
+        });
 
-
-
-
-
-
-
-
-});
-
-function displayTime() {
-    var str = "";
-
-    var currentTime = new Date()
-    var hours = currentTime.getHours()
-    var minutes = currentTime.getMinutes()
-    var seconds = currentTime.getSeconds()
-
-    if (minutes < 10) { minutes = "0" + minutes }
-    if (seconds < 10) { seconds = "0" + seconds }
-    str += hours + ":" + minutes + ":" + seconds + " ";
-    if(hours > 11){ str += "PM" } 
-    	else { str += "AM" }
-    return str;
-}
+        function displayTime() {
+            var str = "";
+            var currentTime = new Date()
+            var hours = currentTime.getHours()
+            var minutes = currentTime.getMinutes()
+            var seconds = currentTime.getSeconds()
+            if (minutes < 10) { minutes = "0" + minutes }
+            if (seconds < 10) { seconds = "0" + seconds }
+            str += hours + ":" + minutes + ":" + seconds + " ";
+            if(hours > 11){ str += "PM" } 
+            	else { str += "AM" }
+            return str;
+        }
 	   
     </script>
-
-
-  </body>
+</body>
 </html>
